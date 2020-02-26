@@ -63,16 +63,31 @@ func main() {
 			msg.Text = "*Hello punker!*"
 		case "/status":
 			msg.Text = "*online*"
-      case "/ban":
-         var kickobj tgbotapi.KickChatMemberConfig
-         kickobj.UserID = update.Message.ReplyToMessage.From.ID
-         kickobj.ChatID = update.Message.Chat.ID
-         bot.KickChatMember(kickobj)
-         msg.Text = "Usuário " + update.Message.ReplyToMessage.From.FirstName + " foi banido(a)"
-
+		case "/ban":
+			var kickobj tgbotapi.KickChatMemberConfig
+			kickobj.UserID = update.Message.ReplyToMessage.From.ID
+			kickobj.ChatID = update.Message.Chat.ID
+			resp, _ := bot.KickChatMember(kickobj)
+			if !resp.Ok {
+				msg.Text = "err"
+			} else {
+				msg.Text = "Usuário " + update.Message.ReplyToMessage.From.FirstName + " foi banido(a)"
+			}
+		case "/pin":
+			var pinobj tgbotapi.PinChatMessageConfig
+			pinobj.ChatID = update.Message.Chat.ID
+			pinobj.MessageID = update.Message.ReplyToMessage.MessageID
+			pinobj.DisableNotification = false
+			resp, _ := bot.PinChatMessage(pinobj)
+			if !resp.Ok {
+				msg.Text = "err"
+			} else {
+				msg.Text = "Mensagem Pinada!"
+			}
 		default:
 			continue
 		}
+
 		bot.Send(msg)
 
 	}
