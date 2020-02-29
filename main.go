@@ -63,12 +63,12 @@ func main() {
 			msg.Text = "*Hello punker!*"
 		case "/status":
 			msg.Text = "*online*"
-      case "/ban":
-         var kickobj tgbotapi.KickChatMemberConfig
-         kickobj.UserID = update.Message.ReplyToMessage.From.ID
-         kickobj.ChatID = update.Message.Chat.ID
-         bot.KickChatMember(kickobj)
-         msg.Text = "Usuário " + update.Message.ReplyToMessage.From.FirstName + " foi banido(a)"
+		case "/ban":
+			var kickobj tgbotapi.KickChatMemberConfig
+			kickobj.UserID = update.Message.ReplyToMessage.From.ID
+			kickobj.ChatID = update.Message.Chat.ID
+			bot.KickChatMember(kickobj)
+			msg.Text = "Usuário " + update.Message.ReplyToMessage.From.FirstName + " foi banido(a)"
 
 		default:
 			continue
