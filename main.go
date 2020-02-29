@@ -42,7 +42,7 @@ func main() {
 
 		switch command {
 		case "/feedback":
-			if update.Message.Chat.Type != "group" {
+			if update.Message.Chat.Type != "group" && update.Message.Chat.Type != "supergroup" {
 				splited := strings.Split(update.Message.Text, " ")
 				feedbackstr := strings.Join(splited[1:], " ")
 
