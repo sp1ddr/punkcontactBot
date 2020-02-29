@@ -48,7 +48,7 @@ func main() {
 
 				// check len of feedback message
 				if len(feedbackstr) >= 10 && len(feedbackstr) <= 400 {
-					reportMsg := fmt.Sprintf(" { #Feedbacks }\nFrom: [%s](tg://user?id=%d) #%d\n\n*Feedback*: %s", update.Message.From.FirstName, update.Message.From.ID, update.Message.From.ID, feedbackstr)
+					reportMsg := fmt.Sprintf(" { #Feedbacks }\nFrom: [%s](tg://user?id=%d) #-%d\n\n*Feedback*: %s", update.Message.From.FirstName, update.Message.From.ID, update.Message.From.ID, feedbackstr)
 
 					messageFeedback := tgbotapi.NewMessage(-1001296144335, reportMsg)
 					messageFeedback.ParseMode = "Markdown"
