@@ -42,17 +42,19 @@ func main() {
 
 		switch command {
 		case "/feedback":
-			splited := strings.Split(update.Message.Text, " ")
-			feedbackstr := strings.Join(splited[1:], " ")
+			if update.Message.Chat.Type == "group" {
+				splited := strings.Split(update.Message.Text, " ")
+				feedbackstr := strings.Join(splited[1:], " ")
 
-			// check len of feedback message
-			if len(feedbackstr) >= 10 && len(feedbackstr) <= 400 {
-				reportMsg := fmt.Sprintf(" { #Feedbacks }\nFrom: [%s](tg://user?id=%d)\n\n*Feedback*: %s", update.Message.From.FirstName, update.Message.From.ID, feedbackstr)
+				// check len of feedback message
+				if len(feedbackstr) >= 10 && len(feedbackstr) <= 400 {
+					reportMsg := fmt.Sprintf(" { #Feedbacks }\nFrom: [%s](tg://user?id=%d)\n\n*Feedback*: %s", update.Message.From.FirstName, update.Message.From.ID, feedbackstr)
 
-				messageFeedback := tgbotapi.NewMessage(-1001296144335, reportMsg)
-				messageFeedback.ParseMode = "Markdown"
+					messageFeedback := tgbotapi.NewMessage(-1001296144335, reportMsg)
+					messageFeedback.ParseMode = "Markdown"
 
-				bot.Send(messageFeedback)
+					bot.Send(messageFeedback)
+				}
 			}
 		case "/afk":
 			msg.Text = update.Message.From.FirstName + " *está afk*"
