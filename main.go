@@ -182,6 +182,20 @@ func main() {
 
 			msg.Text = "Usuário " + update.Message.ReplyToMessage.From.FirstName + " foi banido(a)"
 			bot.Send(msg)
+		case "/pin":
+			var pinobj tgbotapi.PinChatMessageConfig
+
+			pinobj.ChatID = update.Message.Chat.ID
+			pinobj.MessageID = update.Message.ReplyToMessage.MessageID
+			pinobj.DisableNotification = false
+
+			resp, _ := bot.PinChatMessage(pinobj)
+			if !resp.Ok {
+				msg.Text = "Err ao fixar mensagem"
+			} else {
+				msg.Text = "*Mensagem fixada!*"
+			}
+			bot.Send(msg)
 		default:
 			continue
 		}
