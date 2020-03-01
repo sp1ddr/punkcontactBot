@@ -43,9 +43,10 @@ func main() {
 		fmt.Println("\t Telegraph key:  ", punkbot.Account.AccessToken, " run 'export TELEGRAPH=your_api_key' for full integration")
 
 		punkbot.TgraphToken = punkbot.Account.AccessToken
+	} else {
+		punkbot.TgraphToken = tgraphapikey
 	}
 
-	punkbot.TgraphToken = tgraphapikey
 	punkbot.SetAccount()
 
 	bot, err := tgbotapi.NewBotAPI(tgapikey)
