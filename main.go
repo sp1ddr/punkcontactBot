@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/gomarkdown/markdown"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/sp1ddr/punkcontactBot/punkbot"
 )
@@ -131,10 +133,14 @@ func main() {
 				splited := strings.Split(update.Message.Text, " ")
 				feedbackstr := strings.Join(splited[1:], " ")
 
+				// parse feedback in markdown to html
+				md := []byte(feedbackstr)
+				html := markdown.ToHTML(md, nil, nil)
+
 				// check len of feedback message
 				if len(feedbackstr) >= 10 && len(feedbackstr) <= 400 {
 
-					uri, err := punkbot.CreatePage(update.Message.From.ID, update.Message.From.FirstName, feedbackstr)
+					uri, err := punkbot.CreatePage(update.Message.From.ID, update.Message.From.FirstName, string(html))
 					if err != nil {
 						msg.Text = "*Error savin data on telegraph*"
 						bot.Send(msg)
