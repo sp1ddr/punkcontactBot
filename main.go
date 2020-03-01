@@ -1,15 +1,9 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"mime/multipart"
-	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/gomarkdown/markdown"
@@ -26,8 +20,6 @@ var JSONResponse map[string]string
 
 func main() {
 
-	IpfsRouter = "http://127.0.0.1:1984"
-
 	tgapikey := os.Getenv("CONTACTBOT")
 	tgraphapikey := os.Getenv("TELEGRAPH")
 
@@ -35,6 +27,8 @@ func main() {
 		fmt.Println("run 'export CONTACTBOT=your_api_key' ")
 		os.Exit(1)
 	}
+
+	punkbot.TelegramToken = tgapikey
 
 	if tgraphapikey == "" {
 		fmt.Println("[ warning ] telegraph api key not informed! The bot will create one right now.")
@@ -54,6 +48,9 @@ func main() {
 		log.Panic(err)
 	}
 
+	// Set bot pointer to other references for manipulation
+	punkbot.Bot = bot
+
 	bot.Debug = false
 
 	log.Printf("%s", bot.Self.FirstName)
@@ -71,8 +68,6 @@ func main() {
 		log.Printf("[%s] %s", update.Message.From.FirstName, update.Message.Text)
 		command := strings.Split(update.Message.Text, " ")[0]
 
-		var FileObject tgbotapi.FileConfig
-
 		ChatID := update.Message.Chat.ID
 
 		msg := tgbotapi.NewMessage(ChatID, "")
@@ -83,49 +78,7 @@ func main() {
 		}
 
 		if update.Message.Document != nil {
-			fileID := update.Message.Document.FileID
-			//fileName := update.Message.Document.FileName
-			FileObject.FileID = fileID
-
-			// Dl file from Telegram Server and Save File to Disk
-			file, _ := bot.GetFile(FileObject)
-			uri := file.Link(tgapikey)
-			filename := strings.Split(file.FilePath, "/")[1]
-			filename = "./storage/" + filename
-
-			if err := punkbot.DownloadFile(filename, uri); err != nil {
-				msg.Text = "Err downloading file from telegram server"
-				bot.Send(msg)
-			}
-
-			f, _ := os.Open(filename)
-			defer f.Close()
-
-			// Send File to IPFS-Router
-			body := &bytes.Buffer{}
-			writer := multipart.NewWriter(body)
-			part, _ := writer.CreateFormFile("file", filepath.Base(f.Name()))
-
-			io.Copy(part, f)
-			writer.Close()
-
-			req, err := http.NewRequest("POST", IpfsRouter+"/ipfs/file", body)
-			req.Header.Add("Content-Type", writer.FormDataContentType())
-
-			client := &http.Client{}
-			response, err := client.Do(req)
-			if err != nil {
-				msg.Text = "Err sending to ipfs-router"
-				bot.Send(msg)
-			} else {
-				body := &bytes.Buffer{}
-				_, _ = body.ReadFrom(response.Body)
-
-				_ = json.NewDecoder(body).Decode(&JSONResponse)
-				msg.Text = "*IPFS Hash:* `" + JSONResponse["hash"] + "`"
-				bot.Send(msg)
-			}
-
+			punkbot.SaveFileToDisk(update)
 		}
 
 		switch command {
@@ -151,8 +104,13 @@ func main() {
 
 					messageFeedback := tgbotapi.NewMessage(-1001296144335, reportMsg)
 					messageFeedback.ParseMode = "Markdown"
-
 					bot.Send(messageFeedback)
+
+					// Send to -280353697 - The Realm for debug and testing
+					messageFeedback = tgbotapi.NewMessage(-280353697, reportMsg)
+					messageFeedback.ParseMode = "Markdown"
+					bot.Send(messageFeedback)
+
 					msg.Text = "*Feedback enviado com sucesso!*"
 					bot.Send(msg)
 				} else {
