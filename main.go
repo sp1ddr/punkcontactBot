@@ -26,8 +26,27 @@ func main() {
 
 	IpfsRouter = "http://127.0.0.1:1984"
 
-	apikey := os.Getenv("CONTACTBOT")
-	bot, err := tgbotapi.NewBotAPI(apikey)
+	tgapikey := os.Getenv("CONTACTBOT")
+	tgraphapikey := os.Getenv("TELEGRAPH")
+
+	if tgapikey == "" {
+		fmt.Println("run 'export CONTACTBOT=your_api_key' ")
+		os.Exit(1)
+	}
+
+	if tgraphapikey == "" {
+		fmt.Println("[ warning ] telegraph api key not informed! The bot will create one right now.")
+		punkbot.CreateAccount()
+
+		fmt.Println("\t Telegraph key:  ", punkbot.Account.AccessToken, " run 'export TELEGRAPH=your_api_key' for full integration")
+
+		punkbot.TgraphToken = punkbot.Account.AccessToken
+	}
+
+	punkbot.TgraphToken = tgraphapikey
+	punkbot.SetAccount()
+
+	bot, err := tgbotapi.NewBotAPI(tgapikey)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -67,7 +86,7 @@ func main() {
 
 			// Dl file from Telegram Server and Save File to Disk
 			file, _ := bot.GetFile(FileObject)
-			uri := file.Link(apikey)
+			uri := file.Link(tgapikey)
 			filename := strings.Split(file.FilePath, "/")[1]
 			filename = "./storage/" + filename
 
@@ -114,17 +133,25 @@ func main() {
 
 				// check len of feedback message
 				if len(feedbackstr) >= 10 && len(feedbackstr) <= 400 {
-					reportMsg := fmt.Sprintf(" { #Feedbacks }\nFrom: [%s](tg://user?id=%d) `#id%d`\n\n*Feedback*: %s", update.Message.From.FirstName, update.Message.From.ID, update.Message.From.ID, feedbackstr)
+
+					uri, err := punkbot.CreatePage(update.Message.From.ID, update.Message.From.FirstName, feedbackstr)
+					if err != nil {
+						msg.Text = "*Error savin data on telegraph*"
+						bot.Send(msg)
+					}
+
+					reportMsg := fmt.Sprintf(" { #Feedbacks }\nFrom: [%s](tg://user?id=%d) `#id%d`\n\n*Feedback*: %s", update.Message.From.FirstName, update.Message.From.ID, update.Message.From.ID, uri)
 
 					messageFeedback := tgbotapi.NewMessage(-1001296144335, reportMsg)
 					messageFeedback.ParseMode = "Markdown"
 
 					bot.Send(messageFeedback)
 					msg.Text = "*Feedback enviado com sucesso!*"
+					bot.Send(msg)
 				} else {
 					msg.Text = "_Feedback len must be greater than 10char and less than 400!_ \n*[ Error ]*"
+					bot.Send(msg)
 				}
-				bot.Send(msg)
 			}
 		case "/afk":
 			msg.Text = update.Message.From.FirstName + " *está afk*"
