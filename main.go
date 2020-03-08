@@ -124,11 +124,13 @@ func main() {
 
 			bot.Send(msg)
 		case "/back":
-			msg.Text = update.Message.From.FirstName + " *está de volta*"
+			escapedName, _ := punkbot.EscapeMarkdown(update.Message.From.FirstName)
+			msg.Text = escapedName + " *está de volta*"
 
 			bot.Send(msg)
 		case "/busy":
-			msg.Text = update.Message.From.FirstName + " *está ocupado*"
+			escapedName, _ := punkbot.EscapeMarkdown(update.Message.From.FirstName)
+			msg.Text = escapedName + " *está ocupado*"
 
 			bot.Send(msg)
 		case "/punker":
