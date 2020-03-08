@@ -162,6 +162,9 @@ func main() {
 			bot.Send(msg)
 
 		case "/pin":
+			if update.Message.ReplyToMessage == nil {
+				continue
+			}
 			var pinobj tgbotapi.PinChatMessageConfig
 
 			pinobj.ChatID = update.Message.Chat.ID
