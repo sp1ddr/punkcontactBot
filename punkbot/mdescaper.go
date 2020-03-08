@@ -64,6 +64,7 @@ func EscapeMarkdown(text string) (string, error) {
 				escapedText = append(escapedText[:pos], newChar...)
 				escapedText = append(escapedText, []byte(text[pos+1:])...)
 			}
+			foundCloseTag = false
 		}
 	}
 	fmt.Println(string(escapedText))
