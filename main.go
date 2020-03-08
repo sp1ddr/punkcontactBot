@@ -78,7 +78,7 @@ func main() {
 		}
 
 		if update.Message.Document != nil {
-			if update.Message.Document.MimeType != "image/gif" {
+			if update.Message.Document.MimeType != "video/mp4" {
 				punkbot.SaveFileToDisk(update)
 			}
 		}
