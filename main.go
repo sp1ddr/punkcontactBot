@@ -119,7 +119,8 @@ func main() {
 				}
 			}
 		case "/afk":
-			msg.Text = update.Message.From.FirstName + " *está afk*"
+			escapedName, _ := punkbot.EscapeMarkdown(update.Message.From.FirstName)
+			msg.Text = escapedName + " *está afk*"
 
 			bot.Send(msg)
 		case "/back":
@@ -147,12 +148,17 @@ func main() {
 
 			msg.Text = "Usuário " + update.Message.ReplyToMessage.From.FirstName + " foi banido(a)"
 			bot.Send(msg)
-			
+
 		case "/echo":
-	                splited := strings.Split(update.Message.Text, " ")
-			msg.Text = strings.Join(splited[1:], " ")
+			splited := strings.Split(update.Message.Text, " ")
+			text := strings.Join(splited[1:], " ")
+			msg.Text, err = punkbot.EscapeMarkdown(text)
+			if err != nil {
+				msg.Text = err.Error()
+			}
+
 			bot.Send(msg)
-			
+
 		case "/pin":
 			var pinobj tgbotapi.PinChatMessageConfig
 
