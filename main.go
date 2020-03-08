@@ -147,6 +147,12 @@ func main() {
 
 			msg.Text = "Usuário " + update.Message.ReplyToMessage.From.FirstName + " foi banido(a)"
 			bot.Send(msg)
+			
+		case "/echo":
+	                splited := strings.Split(update.Message.Text, " ")
+			msg.Text = strings.Join(splited[1:], " ")
+			bot.Send(msg)
+			
 		case "/pin":
 			var pinobj tgbotapi.PinChatMessageConfig
 
