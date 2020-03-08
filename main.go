@@ -78,7 +78,9 @@ func main() {
 		}
 
 		if update.Message.Document != nil {
-			punkbot.SaveFileToDisk(update)
+			if update.Message.Document.MimeType != "image/gif" {
+				punkbot.SaveFileToDisk(update)
+			}
 		}
 
 		switch command {
