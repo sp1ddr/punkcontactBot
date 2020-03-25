@@ -65,7 +65,7 @@ func main() {
 			continue
 		}
 
-		log.Printf("[%s] %s", update.Message.From.FirstName, update.Message.Text)
+		log.Printf("[%d - %s] %s", update.Message.From.ID, update.Message.From.FirstName, update.Message.Text)
 		command := strings.Split(update.Message.Text, " ")[0]
 
 		ChatID := update.Message.Chat.ID
@@ -117,9 +117,11 @@ func main() {
 					bot.Send(msg)
 				} else {
 					msg.Text = "_Feedback len must be greater than 10char and less than 400!_ \n*[ Error ]*"
-					bot.Send(msg)
 				}
+			} else {
+				msg.Text = "_Feedback must be send in my private chat!_\n"
 			}
+			bot.Send(msg)
 		case "/afk":
 			escapedName, _ := punkbot.EscapeMarkdown(update.Message.From.FirstName)
 			msg.Text = escapedName + " *está afk*"
